@@ -49,4 +49,23 @@ def buy():
     data = res.read()
     print(data.decode("utf-8"))
 
-buy()
+def buy50():
+
+    for i in range(50):
+        conn = http.client.HTTPSConnection("zsutstockserver.azurewebsites.net")
+        payload = json.dumps({
+            "stockExchange": "Warszawa",
+            "share": "ASSECOPOL",
+            "amount": 1,
+            "price": 91
+        })
+        headers = {
+            'Authorization': 'Basic MDExNTg2NTZAcHcuZWR1LnBsOjgrdWYrNWQ=',
+            'Content-Type': 'application/json'
+        }
+        conn.request("POST", "/api/buyoffer", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
+
+buy50()
