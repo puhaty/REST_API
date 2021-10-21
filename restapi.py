@@ -49,3 +49,4 @@ def buy():
     data = res.read()
     print(data.decode("utf-8"))
 
+buy()
