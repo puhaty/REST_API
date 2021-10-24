@@ -316,20 +316,23 @@ while(True):
     i += 1
     data = get_amount()
     counter = 1
+    guard = False
     sorted_data = sorted(data.items(), key = lambda item: item[1])
     for i in range(len(sorted_data)-1):
         cities = get_stock_exchanges()
         if(sorted_data[i][1] == sorted_data[i+1][1]):
             print(i)
+            guard = True
             for j in range(0, len(cities)):
                 if(sorted_data[i][0] in get_shares_list(cities[j])):
                     buy_amount(cities[j], sorted_data[i][0], int(counter))
                 data = get_amount()
             counter += 1
             data = get_amount()
-        elif i == len(sorted_data):
-            break
-#print(sorted_data)
+    if(guard == False):
+        break
+        #elif i == len(sorted_data - 1):
+            #break
 
 client_data()
 grade()
