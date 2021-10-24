@@ -312,7 +312,7 @@ client_data()
 sell_all()
 buy_all()
 i = 0
-while(True):
+while(i < 60):
     i += 1
     data = get_amount()
     counter = 1
