@@ -309,10 +309,10 @@ client_data()
 #kupno wzzystkich spółek w różnej liczbie
 #'''
 client_data()
-#sell_all()
-#buy_all()
+sell_all()
+buy_all()
 i = 0
-while(i == 20):
+while(True):
     i += 1
     data = get_amount()
     counter = 1
@@ -327,6 +327,8 @@ while(i == 20):
                 data = get_amount()
             counter += 1
             data = get_amount()
+        elif i == len(sorted_data):
+            break
 #print(sorted_data)
 
 client_data()
