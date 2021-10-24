@@ -71,7 +71,7 @@ def buy_1(city, share, price):
         "stockExchange": city,
         "share": share,
         "amount": 1,
-        "price": price + 1000
+        "price": price + 100000
     })
 
     headers = {
