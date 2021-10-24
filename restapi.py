@@ -312,7 +312,7 @@ client_data()
 sell_all()
 buy_all()
 i = 0
-while(i < 60):
+while(i < 50):
     i += 1
     data = get_amount()
     counter = 1
@@ -327,8 +327,8 @@ while(i < 60):
                 data = get_amount()
             counter += 1
             data = get_amount()
-        elif i == len(sorted_data):
-            break
+        #elif i == len(sorted_data):
+            #break
 #print(sorted_data)
 
 client_data()
