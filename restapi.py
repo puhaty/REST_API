@@ -309,7 +309,7 @@ client_data()
 #kupno wzzystkich spółek w różnej liczbie
 #'''
 client_data()
-#sell_all()
+sell_all()
 buy_all()
 
 while()
