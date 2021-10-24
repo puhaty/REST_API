@@ -1,11 +1,14 @@
 import http.client
 import mimetypes
 import json
+import random
 conn = http.client.HTTPSConnection("zsutstockserver.azurewebsites.net")
 payload = ''
 headers = {}
 
 def get_stock_exchanges():
+    payload = ''
+    headers = {}
     conn.request("GET", "/api/stockexchanges", payload, headers)
     res = conn.getresponse()
     data = res.read()
@@ -30,7 +33,26 @@ def get_shares_list(city):
     #print(shares)
     return shares
 
-def get_share_price(city, share):
+def get_share_price_sell(city, share):
+    payload = ''
+    headers = {
+        'Cookie': 'ARRAffinity=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54; ARRAffinitySameSite=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54'
+    }
+
+    conn.request("GET", "/api/shareprice/" + city + "?share=" + share, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    temp = data.decode("utf-8").split(',')
+    price = float(temp[5].strip('"price":'))
+    #print(data.decode("utf-8"))
+    return price
+
+def get_share_price_buy(city, share):
+    payload = ''
+    headers = {
+        'Cookie': 'ARRAffinity=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54; ARRAffinitySameSite=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54'
+    }
+
     conn.request("GET", "/api/shareprice/" + city + "?share=" + share, payload, headers)
     res = conn.getresponse()
     data = res.read()
@@ -86,7 +108,7 @@ def buy_1(city, share, price):
 
 def buy_amount(city, share, amount):
     for i in range(0, amount):
-        price = get_share_price(city, share)
+        price = get_share_price_buy(city, share)
         buy_1(city, share, price)
 
 def grade():
@@ -123,11 +145,25 @@ def get_amount():
             amount[key] = value
     return amount
 
+def get_amount_share(city, share):
+    payload = ''
+    headers = {
+        'Cookie': 'ARRAffinity=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54; ARRAffinitySameSite=17d4a7379fd5208547170b80243178455a569b5053598ccf1b21a534dff90a54'
+    }
+    conn.request("GET", "/api/shareprice/" + city + "?share=" + share, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    temp = data.decode("utf-8").split(',')
+    amount_share = temp[3].strip('"amount":')
+    amount_share = amount_share.strip('{}')
+    return int(amount_share)
+
+
 def buy_number_letters(number_of_shares):
     end = False
     cities = get_stock_exchanges()
     temp = get_shares_list(cities[0])
-    buy_1(cities[0], temp[0], get_share_price(cities[0], temp[0]))
+    buy_1(cities[0], temp[0], get_share_price_buy(cities[0], temp[0]))
     for i in range(0, len(cities)):
         if(end == False):
             shares = get_shares_list(cities[i])
@@ -145,7 +181,7 @@ def buy_number_letters(number_of_shares):
                             if ((len(amount.keys()) >= number_of_shares) and (amount[shares[j]] == len(shares[j]))):
                                 break
                             if (amount[shares[j]] < len(shares[j])):
-                                price = get_share_price(cities[i], shares[j])
+                                price = get_share_price_buy(cities[i], shares[j])
                                 buy_1(cities[i], shares[j], price)
                             else:
                                 if(j < len(shares) - 1):
@@ -156,14 +192,14 @@ def buy_number_letters(number_of_shares):
                                         if (len(amount.keys()) == number_of_shares):
                                             continue
                                         else:
-                                            buy_1(cities[i], shares[j + 1], get_share_price(cities[i], shares[j + 1]))
+                                            buy_1(cities[i], shares[j + 1], get_share_price_buy(cities[i], shares[j + 1]))
                                             continue
                                 else:
                                     shares = get_shares_list(cities[i + 1])
                                     if (shares[0] in amount.keys()):
                                         continue
                                     else:
-                                        price = get_share_price(cities[i + 1], shares[0])
+                                        price = get_share_price_buy(cities[i + 1], shares[0])
                                         buy_1(cities[i + 1], shares[0], price)
                                         break
                 amount = get_amount()
@@ -173,27 +209,71 @@ def buy_number_letters(number_of_shares):
         else:
             break
 
+def buy_all():
+    cities = get_stock_exchanges()
+    counter = 0
+    for i in range(0, len(cities)):
+        shares = get_shares_list(cities[i])
+        for j in range(0, len(shares)):
+            counter += 1
+            buy_amount(cities[i], shares[j], counter)
+            '''
+            shares_amount_ = get_amount_share(cities[i], shares[j])
+            if (shares_amount_ <= 50):
+                shares_amount_ = random.randrange(1, 50)
+                print(shares_amount_, "q")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if(shares_amount_ > 50 and shares_amount_ <= 100):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "w")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if (shares_amount_ > 100 and shares_amount_ <= 200):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "e")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if (shares_amount_ > 200 and shares_amount_ <= 500):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "r")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if (shares_amount_ > 500 and shares_amount_ <= 1000):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "t")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if (shares_amount_ > 1000 and shares_amount_ <= 3000):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "u")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            if (shares_amount_ > 3000 and shares_amount_ <= 10000):
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "i")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            else:
+                shares_amount_ = random.randrange(1, 70)
+                print(shares_amount_, "x")
+                buy_amount(cities[i], shares[j], shares_amount_)
+            '''
 
 def sell_all():
-    cities = get_stock_exchanges()
-    for i in range(0, len(cities)):
-        dict = get_amount()
-        for k, v in dict.items():
-            while v >= 0:
-                sell(cities[i], k, 1, 0.1)
-                v -= 1
-                #print(k, v, cities[i])
+    amount_ = get_amount()
+    while (len(amount_.keys()) > 0):
+        cities = get_stock_exchanges()
+        for i in range(0, len(cities)):
+            dict = get_amount()
+            for k, v in dict.items():
+                while v >= 0:
+                    sell(cities[i], k, 1, 0.1)
+                    v -= 1
+                    #print(k, v, cities[i])
+        amount_ = get_amount()
+        print(len(amount_.keys()))
 
 #######################################################
 
 #kupno co najmniej jednego:
 '''
 client_data()
-amount_ = get_amount()
-while(len(amount_.keys()) > 0):
-    sell_all()
-    amount_ = get_amount()
-    print(len(amount_.keys()))
+sell_all()
+
 buy_amount("Warszawa", "PKNORLEN", 5)
 client_data()
 grade()
@@ -203,24 +283,19 @@ grade()
 #kupno co najmniej 49:
 '''
 client_data()
-amount_ = get_amount()
-while(len(amount_.keys()) > 0):
-    sell_all()
-    amount_ = get_amount()
-    print(len(amount_.keys()))
+sell_all()
+
 buy_amount("Warszawa", "PKNORLEN", 50)
 client_data()
 grade()
 '''
 ######################################################
+
 #kupno wg ilości liter w spółce;
-#'''
+'''
 client_data()
-amount_ = get_amount()
-while(len(amount_.keys()) > 0):
-    sell_all()
-    amount_ = get_amount()
-    print(len(amount_.keys()))
+sell_all()
+
 buy_number_letters(40)
 amount_ = get_amount()
 for k, v in amount_.items():
@@ -228,12 +303,30 @@ for k, v in amount_.items():
 print(len(amount_.keys()))
 grade()
 client_data()
-#'''
+'''
 #######################################################
 
+#kupno wzzystkich spółek w różnej liczbie
+#'''
+client_data()
+#sell_all()
+#buy_all()
+data = get_amount()
+counter = 1
+sorted_data = sorted(data.items(), key = lambda item: item[1])
+for i in range(len(sorted_data)-1):
+    cities = get_stock_exchanges()
+    if(sorted_data[i][1] == sorted_data[i+1][1]):
+        for i in range(0, len(cities)):
+            sell(cities[i], sorted_data[i][0], counter, 0.1)
+        counter += 1
 
 
+client_data()
+grade()
+#'''
 
+########################################################
 
 
 
