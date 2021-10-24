@@ -311,23 +311,23 @@ client_data()
 client_data()
 #sell_all()
 #buy_all()
-
-#while(True)
-data = get_amount()
-counter = 1
-sorted_data = sorted(data.items(), key = lambda item: item[1])
-for i in range(len(sorted_data)-1):
-    cities = get_stock_exchanges()
-    if(sorted_data[i][1] == sorted_data[i+1][1]):
-        print(i)
-        for j in range(0, len(cities)):
-            if(sorted_data[i][0] in get_shares_list(cities[j])):
-                buy_amount(cities[j], sorted_data[i][0], int(counter))
-            #sell(cities[j], sorted_data[i][0], counter, 0.1)
+i = 0
+while(i == 20):
+    i += 1
+    data = get_amount()
+    counter = 1
+    sorted_data = sorted(data.items(), key = lambda item: item[1])
+    for i in range(len(sorted_data)-1):
+        cities = get_stock_exchanges()
+        if(sorted_data[i][1] == sorted_data[i+1][1]):
+            print(i)
+            for j in range(0, len(cities)):
+                if(sorted_data[i][0] in get_shares_list(cities[j])):
+                    buy_amount(cities[j], sorted_data[i][0], int(counter))
+                data = get_amount()
+            counter += 1
             data = get_amount()
-        counter += 1
-        data = get_amount()
-print(sorted_data)
+#print(sorted_data)
 
 client_data()
 grade()
