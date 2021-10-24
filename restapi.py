@@ -310,17 +310,21 @@ client_data()
 #'''
 client_data()
 #sell_all()
-#buy_all()
+buy_all()
+
 data = get_amount()
 counter = 1
 sorted_data = sorted(data.items(), key = lambda item: item[1])
 for i in range(len(sorted_data)-1):
     cities = get_stock_exchanges()
     if(sorted_data[i][1] == sorted_data[i+1][1]):
+        print(i)
         for i in range(0, len(cities)):
             sell(cities[i], sorted_data[i][0], counter, 0.1)
+            data = get_amount()
         counter += 1
-
+        data = get_amount()
+print(sorted_data)
 
 client_data()
 grade()
